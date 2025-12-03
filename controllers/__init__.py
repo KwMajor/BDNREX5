@@ -1,0 +1,4 @@
+from controllers.usuario_controller import UsuarioController
+from controllers.vendedor_controller import VendedorController
+from controllers.produto_controller import ProdutoController
+from controllers.compra_controller import CompraController
