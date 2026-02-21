@@ -1,39 +1,31 @@
-import unittest
-from unittest.mock import MagicMock
-from controllers.usuario_controller import UsuarioController
+name: Python CI
 
-class TestUsuarioController(unittest.TestCase):
-    def setUp(self):
-        # Criamos um "fake" do banco de dados para não precisar de uma conexão real
-        self.mock_db = MagicMock()
-        self.controller = UsuarioController(self.mock_db)
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
 
-    def test_criar_usuario_sucesso(self):
-        # Simulamos o que o banco de dados deveria retornar
-        dados_usuario = {
-            'id': '123',
-            'nome': 'Teste',
-            'email': 'teste@email.com',
-            'telefone': '123456789'
-        }
-        
-        # Configuramos o mock para retornar o usuário quando execute_write for chamado
-        self.mock_db.execute_write.return_value = {'u': dados_usuario}
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-        resultado = self.controller.criar_usuario("Teste", "teste@email.com", "123456789")
+    steps:
+    - uses: actions/checkout@v4
 
-        # Verificações
-        self.assertIsNotNone(resultado)
-        self.assertEqual(resultado['nome'], "Teste")
-        self.assertTrue(self.mock_db.execute_write.called)
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-    def test_buscar_usuario_nao_existente(self):
-        # Simulamos que o banco não encontrou nada
-        self.mock_db.execute_query.return_value = []
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Instala as dependências do seu projeto e o pytest para rodar os testes
+        pip install -r BDNREX5/requirements.txt
+        pip install pytest
 
-        resultado = self.controller.buscar_usuario("id-inexistente")
-
-        self.assertIsNone(resultado)
-
-if __name__ == '__main__':
-    unittest.main()
+    - name: Run Tests
+      run: |
+        # O pytest descobre automaticamente ficheiros que começam com test_
+        pytest test_usuario.py
